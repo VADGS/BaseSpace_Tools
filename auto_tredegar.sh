@@ -16,15 +16,15 @@ If you wish to run Tredegar on extant BaseSpace projects,  provide the names of 
 
 # If the user invokes the script with -h or any command line arguments, print some help.
 if [ "$#" -eq 0 ] || [ "$1" == "-h" ] ; then
-  echo "HELP"
+  echo "$HELP"
   exit 0
 fi
 
 # set variables from user input
 bs_path=$1
 if [ -z "$2" ]; then
-  echo "Output directory required"
-  echo $HELP
+  echo "Output directory is required. 
+  $HELP"
   exit 0
 else
   output=$2
@@ -75,7 +75,7 @@ do
       fi
     fi
   done
-  sleep 30s
+  sleep 30m
 
   # refresh  basemounted directory 
   if [ -n "$(basemount-cmd --path ${bs_path}/Projects refresh | grep Error)" ]
