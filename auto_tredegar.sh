@@ -81,7 +81,7 @@ do
       fi
     fi
   done
-  sleep 2m
+  sleep 30m
 
   # refresh  basemounted directory 
   if [ -n "$(basemount-cmd --path ${bs_path}/Projects refresh | grep Error)" ]
