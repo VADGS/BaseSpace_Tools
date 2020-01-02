@@ -47,6 +47,7 @@ if [ ! -z "$project_list" -a "$project_list" != " " ]; then
   for project in $(echo $project_list | sed "s/,/ /g")
   do
    # if so, remove project from bs_project.log so that tredegar reports will be generated for those projects
+   echo ${project}
    sed -e s/${project}//g -i ${output}/bs_projects.log
   done
 fi
@@ -61,21 +62,26 @@ do
     if ! grep "${project}" ${output}/bs_projects.log
     then
       echo "new project found: ${project}"
-      # check to make sure read files are availalbe, first
-      if [ "$(ls ${bs_path}/Projects/${project}/Samples/)" ]
-      then 
+      # check to make sure read files in addition to the positive controls are availalbe before running tredegar
+      number_of_samples="$(ls ${bs_path}/Projects/${project}/Samples/ | wc -l)"
+      if (( ${number_of_samples} > 2 ))
+      then
+	strt="$(date +%s)" 
         staphb_toolkit_workflows tredegar ${bs_path}/Projects/${project} -o ${output}/${project}
-        mkdir ${bs_path}/Projects/${project}/AppResults/Tredegar_"$(date +%F)"_"$(date +%H:%M)"/
+        end="$(date +%s)"
+	runtime=$((${end}-${strt}))
+	runtime_min=$(echo "scale=2; $runtime / 60" | bc)
+	mkdir ${bs_path}/Projects/${project}/AppResults/Tredegar_"$(date +%F)"_"$(date +%H:%M)"/
 	# copy file to a Tredegar AppResults and mark session complete
         cp ${output}/${project}/tredegar_output/*report.tsv ${bs_path}/Projects/${project}/AppResults/Tredegar_"$(date +%F)"_"$(date +%H:%M)"/  && cd ${bs_path}/Projects/${project}/AppResults/Tredegar_"$(date +%F)"_"$(date +%H:%M)"/ && basemount-cmd mark-as-complete
         cd $HOME
-        echo "$project added "$(date +%F)"_"$(date +%H:%M)"" >> ${output}/bs_projects.log
+	echo "$project added "$(date +%F)"_"$(date +%H:%M)". Runtime: ${runtime_min}M" >> ${output}/bs_projects.log
       else
         echo "Read files not yet available for ${project}"
       fi
     fi
   done
-  sleep 30m
+  sleep 2m
 
   # refresh  basemounted directory 
   if [ -n "$(basemount-cmd --path ${bs_path}/Projects refresh | grep Error)" ]
