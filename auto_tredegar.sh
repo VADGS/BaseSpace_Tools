@@ -66,6 +66,8 @@ do
       number_of_samples="$(ls ${bs_path}/Projects/${project}/Samples/ | wc -l)"
       if (( ${number_of_samples} > 2 ))
       then
+	# allow time for all read data to be transferred to BaseSpace project
+	sleep 15m
 	strt="$(date +%s)" 
         staphb_toolkit_workflows tredegar ${bs_path}/Projects/${project} -o ${output}/${project}
         end="$(date +%s)"
