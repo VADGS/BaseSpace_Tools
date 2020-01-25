@@ -56,6 +56,8 @@ fi
 while [ -d "$bs_path" ]
 do
   bs_projects="$(ls ${bs_path}/Projects)"
+  # makew newlines only separator 
+  IFS=$'\n'
   for project in ${bs_projects}
   do 
     # if a project in the mounted directory isn't in the bs_projects.log file, run tredegar
