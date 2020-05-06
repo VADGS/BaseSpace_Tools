@@ -44,7 +44,7 @@ mkdir ${output}/logs
 ls -d1 ${bs_path}/Projects/nCOV* | awk -F "/" '{print $NF}' > ${output}/logs/ncov_bs_projects.log
 
 # set error log file
-echo "$(date) Auto Monroe started" >>  ${output}/logs/auto_monroe.log
+echo "$(date) Auto Monroe started: auto_monroe.sh $1 $2 $3" >>  ${output}/logs/auto_monroe.log
 
 # check to see if a speific list of projects have been provided
 if [ ! -z "$project_list" -a "$project_list" != " " ]; then
