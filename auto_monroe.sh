@@ -74,7 +74,7 @@ do
       if (( ${number_of_samples} > 2 ))
       then
 	# allow time for all read data to be transferred to BaseSpace project
-###	sleep 15m
+	sleep 15m
         # Check to see if primers are properly set
         primers=$( echo "${project}" | awk -F "_" '{print $NF}')
         echo "ARTIC Primers: ${primers}"
