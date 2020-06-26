@@ -35,8 +35,8 @@ project_list=$3
 if [ -n "$(basemount-cmd --path ${bs_path}/Projects refresh | grep Error)" ]
 then
   echo "Issue with basemount directory; attempting to remount ${bs_path}"
-  yes | basemount --unmount ${path}
-  basemount ${path} 
+  yes | basemount --unmount ${bs_path}
+  basemount ${bs_path} 
 fi
 
 #capture list of bs_projects
@@ -115,8 +115,8 @@ do
   if [ -n "$(basemount-cmd --path ${bs_path}/Projects refresh | grep Error)" ]
   then
     echo "Issue with basemount directory; attempting to remount ${bs_path}"
-    yes | basemount --unmount ${path}
-    basemount ${path}
+    yes | basemount --unmount ${bs_path}
+    basemount ${bs_path}
   fi
 
 done
