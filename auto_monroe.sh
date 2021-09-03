@@ -85,7 +85,16 @@ do
         fi
 	echo "grabbing read data from ${bs_path}/Projects/${project}"
 	mkdir -p ${output}/${project}/reads/
-	cp ${bs_path}/Projects/${project}/Samples/*/Files/*.gz ${output}/${project}/reads/ 
+        #Concatenate all reads that are R1 together across all lanes, and all R2 together
+        for i in ${bs_path}/Projects/${project}/Samples/*/Files/*.gz; do
+            dirnm="$(dirname "${i}")"
+            bsnm="$(basename "${i}")"
+            basen=$(echo $bsnm | cut -d"_" -f1)
+            cat ${dirnm}/${basen}*_R1_* > ${output}/${project}/reads/${basen}_R1.fastq.gz
+            cat ${dirnm}/${basen}*_R2_* > ${output}/${project}/reads/${basen}_R2.fastq.gz
+            continue
+        done
+	#Former copy over reads: cp ${bs_path}/Projects/${project}/Samples/*/Files/*.gz ${output}/${project}/reads/
 	echo -e "$(date) Monroe initiated: \n\tProject: ${project}, primers: ${primers}" >>  ${output}/logs/auto_monroe.log
 	start_time="$(date +%s)"
 	staphb-wf monroe pe_assembly ${output}/${project}/reads/ --primers ${primers} -o ${output}/${project} 
@@ -93,15 +102,15 @@ do
         end_time="$(date +%s)"
 	runtime=$((${end_time}-${start_time}))
 	runtime_min=$(echo "scale=2; $runtime / 60" | bc)
-        if [ ! -f ${output}/${project}/assemblies/*assembly_metrics.csv ]; then
-	  echo -e "\tError: assembly_meterics.csv file not found for project ${project}. Runtime: ${runtime_min}M" >> ${output}/logs/auto_monroe.log
+        if [ ! -f ${output}/${project}/assemblies/monroe_summary*.csv ]; then
+	  echo -e "\tError: Monroe summary file not found for project ${project}. Runtime: ${runtime_min}M" >> ${output}/logs/auto_monroe.log
           echo $project >> ${output}/logs/ncov_bs_projects.log
 	  break
         fi
 	echo -e "\tMonroe completed succesffully. Runtime: ${runtime_min}M" >> ${output}/logs/auto_monroe.log 
 	mkdir ${bs_path}/Projects/${project}/AppResults/Monroe_"$(date +%F)"_"$(date +%H:%M)"/
 	# copy file to a Monroe AppResults and mark session complete
-        cp ${output}/${project}/assemblies/*_assembly_metrics.csv  ${bs_path}/Projects/${project}/AppResults/Monroe_"$(date +%F)"_"$(date +%H:%M)"/  && cd ${bs_path}/Projects/${project}/AppResults/Monroe_"$(date +%F)"_"$(date +%H:%M)"/ && basemount-cmd mark-as-complete
+        cp ${output}/${project}/assemblies/monroe_summary*.csv  ${bs_path}/Projects/${project}/AppResults/Monroe_"$(date +%F)"_"$(date +%H:%M)"/  && cd ${bs_path}/Projects/${project}/AppResults/Monroe_"$(date +%F)"_"$(date +%H:%M)"/ && basemount-cmd mark-as-complete
         cd $output  
 	echo "$project" >> ${output}/logs/ncov_bs_projects.log
       else
